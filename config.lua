@@ -6,11 +6,11 @@ Config.Debug = true
 ----------------------------------------------------------------
 -- !!! This function is clientside AND serverside !!!
 -- Look for type == 'client' and type == 'server'
-Config.Notification = function(src, type, xPlayer, message)
-    if type == 'client' then -- clientside
-        ESX.ShowNotification(message) -- replace this with your Notify
-    elseif type == 'server' then -- serverside
-        xPlayer.showNotification(message) -- replace this with your Notify
+Config.Notification = function(src, action, xPlayer, message)
+    if action == 'client' then -- clientside
+        MSK.Notification(message) -- replace this with your Notify
+    elseif action == 'server' then -- serverside
+        MSK.Notification(src, message) -- replace this with your Notify
     end
 end
 ----------------------------------------------------------------

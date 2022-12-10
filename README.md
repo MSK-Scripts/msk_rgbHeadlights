@@ -5,3 +5,4 @@ Changeable Vehicle Headlights with an Item
 * ESX 1.2 and above
 * NativeUI
 * oxmysql
+* msk_core

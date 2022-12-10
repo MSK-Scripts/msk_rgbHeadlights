@@ -1,28 +1,29 @@
 ESX = exports["es_extended"]:getSharedObject()
-
+MSK = exports.msk_core:getCoreObject()
 
 CreateThread(function()
     while true do
-        Wait(1000)
+        local sleep = 1000
         local vehicle = GetVehiclePedIsIn(PlayerPedId(), false) -- false = CurrentVehicle, true = LastVehicle
 
         if DoesEntityExist(vehicle) then
             local headlight = GetVehicleXenonLightsColor(vehicle)
             local plate = GetVehicleNumberPlateText(vehicle)
 
-            ESX.TriggerServerCallback("msk_rgbHeadlights:getHeadlightColor", function(color)
-                if not color then return end
+            local color = MSK.TriggerCallback("msk_rgbHeadlights:getHeadlightColor", plate)
+            if not color then return end
                 
-                if color ~= headlight then
-                    debug('Set headlight to ' .. color)
-                    ToggleVehicleMod(vehicle, 22, true) -- toggle xenon
-                    SetVehicleHeadlightsColour(vehicle, color)
-                    ESX.Game.SetVehicleProperties(vehicle, {
-                        xenonColor = color
-                    })
-                end
-            end, plate) 
+            if color ~= headlight then
+                logging('debug', 'Set headlight to ' .. color)
+                ToggleVehicleMod(vehicle, 22, true) -- toggle xenon
+                SetVehicleHeadlightsColour(vehicle, color)
+                ESX.Game.SetVehicleProperties(vehicle, {
+                    xenonColor = color
+                })
+            end
         end
+
+        Wait(sleep)
     end
 end)
 
@@ -30,12 +31,14 @@ end)
 _menuPool = NativeUI.CreatePool()
 local mainMenu
 
-Citizen.CreateThread(function()
+CreateThread(function()
 	while true do
+        local sleep = 200
 		if _menuPool:IsAnyMenuOpen() then 
+            sleep = 0
             _menuPool:ProcessMenus()
         end
-		Citizen.Wait(1)
+		Wait(sleep)
 	end
 end)
 ---- NativeUI ----
@@ -46,7 +49,7 @@ AddEventHandler('msk_rgbHeadlights:checkHeadlights', function()
 end)
 
 function openHeadlightsMenu()
-    if mainMenu ~= nil and mainMenu:Visible() then
+    if mainMenu and mainMenu:Visible() then
         mainMenu:Visible(false)
     end
 
@@ -99,10 +102,10 @@ function setVehicleHeadlight(color)
                     })
                 end
                 TriggerServerEvent('msk_rgbHeadlights:setHeadlights', color, plate)
-                Config.Notification(source, 'client', nil, Translation[Config.Locale]['new_headlight'] .. color.label)
+                Config.Notification(nil, 'client', nil, Translation[Config.Locale]['new_headlight'] .. color.label)
                 setColor = true
             else
-                Config.Notification(source, 'client', nil, Translation[Config.Locale]['not_in_distance'])
+                Config.Notification(nil, 'client', nil, Translation[Config.Locale]['not_in_distance'])
             end
         end
 
@@ -131,19 +134,14 @@ function setVehicleHeadlight(color)
                 })
             end
             TriggerServerEvent('msk_rgbHeadlights:setHeadlights', color, plate)
-            Config.Notification(source, 'client', nil, Translation[Config.Locale]['new_headlight'] .. color.label)
+            Config.Notification(nil, 'client', nil, Translation[Config.Locale]['new_headlight'] .. color.label)
         end
     end
 end
 
-function debug(msg, msg2, msg3)
-	if Config.Debug then
-		if msg3 then
-			print('[DEBUG]', msg, msg2, msg3)
-        elseif msg2 and not msg3 then
-            print('[DEBUG]', msg, msg2)
-        else
-		    print('[DEBUG]', msg)
-        end
-	end
+logging = function(code, msg, msg2, msg3)
+    if Config.Debug then
+        local script = "[^2"..GetCurrentResourceName().."^0]"
+        MSK.logging(script, code, msg, msg2, msg3)
+    end
 end

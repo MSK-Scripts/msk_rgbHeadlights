@@ -4,14 +4,9 @@ games { 'gta5' }
 author 'Musiker15 - MSK Scripts'
 name 'msk_rgbheadlights'
 description 'Changeable Vehicle Headlights with an Item'
-version '1.0'
+version '1.1'
 
 lua54 'yes'
-
-escrow_ignore {
-	'config.lua',
-	'locales/*.lua'
-}
 
 shared_script {
 	'config.lua',
@@ -30,5 +25,6 @@ server_scripts {
 
 dependencies {
 	'es_extended',
-	'oxmysql'
+	'oxmysql',
+	'msk_core'
 }
