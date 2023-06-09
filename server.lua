@@ -1,13 +1,7 @@
 ESX = exports["es_extended"]:getSharedObject()
 MSK = exports.msk_core:getCoreObject()
 
-AddEventHandler('onResourceStart', function(resource)
-    if GetCurrentResourceName() ~= 'msk_rgbHeadlights' then
-        print('^1Please rename the Script to^3 msk_rgbHeadlights^0!')
-        print('^1Server will be shutdown^0!')
-        os.exit()
-    end
-    
+AddEventHandler('onResourceStart', function(resource)    
 	if resource == GetCurrentResourceName() then
         local alterTable = MySQL.query.await("ALTER TABLE owned_vehicles ADD COLUMN IF NOT EXISTS `headlight` varchar(255) DEFAULT NULL;")
         local item = MySQL.query.await("SELECT * FROM items WHERE name = @name", {['@name'] = Config.Item.name})
