@@ -8,9 +8,9 @@ Config.Debug = true
 -- Look for type == 'client' and type == 'server'
 Config.Notification = function(src, action, xPlayer, message)
     if action == 'client' then -- clientside
-        MSK.Notification(message) -- replace this with your Notify
+        MSK.Notification('MSK Headlights', message) -- replace this with your Notify
     elseif action == 'server' then -- serverside
-        MSK.Notification(src, message) -- replace this with your Notify
+        MSK.Notification(src, 'MSK Headlights', message) -- replace this with your Notify
     end
 end
 ----------------------------------------------------------------
