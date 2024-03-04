@@ -5,12 +5,11 @@ Config.VersionChecker = true
 Config.Debug = true
 ----------------------------------------------------------------
 -- !!! This function is clientside AND serverside !!!
--- Look for type == 'client' and type == 'server'
-Config.Notification = function(src, action, xPlayer, message)
-    if action == 'client' then -- clientside
-        MSK.Notification('MSK Headlights', message) -- replace this with your Notify
-    elseif action == 'server' then -- serverside
-        MSK.Notification(src, 'MSK Headlights', message) -- replace this with your Notify
+Config.Notification = function(source, message, info)
+    if IsDuplicityVersion() then -- serverside
+        MSK.Notification(source, 'MSK RGBHeadlights', message, info)
+    else -- clientside
+        MSK.Notification('MSK RGBHeadlights', message, info)
     end
 end
 ----------------------------------------------------------------

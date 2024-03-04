@@ -1,7 +1,4 @@
-ESX = exports["es_extended"]:getSharedObject()
-MSK = exports.msk_core:getCoreObject()
-
-AddEventHandler('onResourceStart', function(resource)    
+AddEventHandler('onResourceStart', function(resource)
 	if resource == GetCurrentResourceName() then
         local alterTable = MySQL.query.await("ALTER TABLE owned_vehicles ADD COLUMN IF NOT EXISTS `headlight` varchar(255) DEFAULT NULL;")
         local item = MySQL.query.await("SELECT * FROM items WHERE name = @name", {['@name'] = Config.Item.name})
@@ -50,21 +47,19 @@ AddEventHandler('msk_rgbHeadlights:setHeadlights', function(color, plate)
 	end
 end)
 
-MSK.RegisterCallback("msk_rgbHeadlights:getHeadlightColor", function(source, cb, plate)
-    local owned_vehicles = MySQL.query.await("SELECT * FROM owned_vehicles WHERE plate = @plate", {['@plate'] = plate})
+MSK.Register("msk_rgbHeadlights:getHeadlightColor", function(source, plate)
+    local owned_vehicles = MySQL.query.await("SELECT * FROM owned_vehicles WHERE plate = ?", {plate})
 
     if owned_vehicles[1] and owned_vehicles[1].headlight then
-        cb(tonumber(owned_vehicles[1].headlight))
+        return tonumber(owned_vehicles[1].headlight)
     else
-        cb(false)
+        return false
     end
 end)
 
-logging = function(code, msg, msg2, msg3)
-    if Config.Debug then
-        local script = "[^2"..GetCurrentResourceName().."^0]"
-        MSK.logging(script, code, msg, msg2, msg3)
-    end
+logging = function(code, ...)
+    if not Config.Debug then return end
+    MSK.logging(code, ...)
 end
 
 ---- GitHub Updater ----

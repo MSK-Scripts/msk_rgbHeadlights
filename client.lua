@@ -1,5 +1,5 @@
-ESX = exports["es_extended"]:getSharedObject()
-MSK = exports.msk_core:getCoreObject()
+local _menuPool, mainMenu = nil, nil
+local isMenuOpen = false
 
 CreateThread(function()
     while true do
@@ -10,7 +10,7 @@ CreateThread(function()
             local headlight = GetVehicleXenonLightsColor(vehicle)
             local plate = GetVehicleNumberPlateText(vehicle)
 
-            local color = MSK.TriggerCallback("msk_rgbHeadlights:getHeadlightColor", plate)
+            local color = MSK.Trigger("msk_rgbHeadlights:getHeadlightColor", plate)
             if not color then return end
                 
             if color ~= headlight then
@@ -27,17 +27,20 @@ CreateThread(function()
     end
 end)
 
----- NativeUI ----
-_menuPool = NativeUI.CreatePool()
-local mainMenu
-
 CreateThread(function()
 	while true do
-        local sleep = 200
-		if _menuPool:IsAnyMenuOpen() then 
-            sleep = 0
-            _menuPool:ProcessMenus()
+        local sleep = 1
+        isMenuOpen = false
+        
+        if _menuPool then
+            if _menuPool:IsAnyMenuOpen() then 
+                isMenuOpen = true
+                _menuPool:ProcessMenus()
+            elseif not _menuPool:IsAnyMenuOpen() then 
+                _menuPool:Remove()
+            end
         end
+        
 		Wait(sleep)
 	end
 end)
@@ -49,9 +52,12 @@ AddEventHandler('msk_rgbHeadlights:checkHeadlights', function()
 end)
 
 function openHeadlightsMenu()
-    if mainMenu and mainMenu:Visible() then
-        mainMenu:Visible(false)
+    if _menuPool then 
+        _menuPool:Remove()
+        _menuPool = nil
     end
+
+    _menuPool = NativeUI.CreatePool()
 
     mainMenu = NativeUI.CreateMenu(Translation[Config.Locale]['header'], '~b~')
     _menuPool:Add(mainMenu)
@@ -139,9 +145,7 @@ function setVehicleHeadlight(color)
     end
 end
 
-logging = function(code, msg, msg2, msg3)
-    if Config.Debug then
-        local script = "[^2"..GetCurrentResourceName().."^0]"
-        MSK.logging(script, code, msg, msg2, msg3)
-    end
+logging = function(code, ...)
+    if not Config.Debug then return end
+    MSK.logging(code, ...)
 end
